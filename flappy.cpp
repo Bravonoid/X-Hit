@@ -9,6 +9,7 @@
 
 using namespace std;
 
+
 void swap(char &a, char &b);
 void fullscreen();
 void decoration();
