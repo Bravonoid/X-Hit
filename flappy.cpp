@@ -19,7 +19,6 @@ void menu();
 void game(bool player);
 void map(vector <vector<char>>& area, int& j, int& k, int& playerI, int& playerJ, int& score);
 void pixel();
-int randomGenerator();
 void leaderboard();
 void input_leaderboard(string& name, int& score);
 void player();
@@ -48,7 +47,7 @@ void fullscreen() {
     cfi.cbSize = sizeof(cfi);
     cfi.nFont = 0;
     cfi.dwFontSize.X = 0;                   // Width of each character in the font
-    cfi.dwFontSize.Y = 32;                  // Height
+    cfi.dwFontSize.Y = 25;                  // Height
     cfi.FontFamily = FF_DONTCARE;
     cfi.FontWeight = FW_NORMAL;
     std::wcscpy(cfi.FaceName, L"Consolas"); // Choose your font
@@ -346,9 +345,12 @@ void game(bool player) {
         if (_kbhit()) {
             key = _getch();
             if ((key == 'w' || key == 'W') && (playerI > 0)) {
-                if (area[playerI - 1][playerJ + 1] == '|') lose = true;
+                if (area[playerI - 1][playerJ + 1] == '|' || area[playerI - 1][playerJ + 1] == '=') lose = true;
                 swap(area[playerI][playerJ], area[playerI-1][playerJ+1]);
                 if (area[playerI + 1][playerJ + 1] == '|' && area[playerI][playerJ + 1] == '|') lose = true;
+            }else {
+            if (area[playerI + 1][playerJ + 1] != ' ') lose = true;
+            swap(area[playerI][playerJ], area[playerI+1][playerJ+1]);
             }
         }
         else {
@@ -449,37 +451,43 @@ void leaderboard() {
     infile.open("leaderboard.txt");
 
     if (infile.fail()) {
-        cerr << "Error Membuka File" << endl;
-        exit(1);
-    }
-
-    int i = 0;
-    int count = 0;
-    while (!infile.eof()) {
-        infile >> p[i].name >> p[i].score;
-        i++;
-        count++;
-    }
-    infile.close();
-
-    sort(p, p + count, player::comp);
-
-    system("cls");
-    decoration();
-    spaces();
-    cout << "          LEADERBOARD" << endl << endl;
-    spaces();
-    cout << "NO.\tNAME\t\tSCORE" << endl;
-    decoration();
-    for (int i = 0; i < count; i++) {
+        system("cls");
+        decoration();
         spaces();
-        cout << i + 1 << ".\t" << p[i].name << "\t\t" << p[i].score << endl;
-        if (i == 9) {
-            break;
+        cerr << "No scores are saved...yet." << endl;
+        decoration();
+        spaces();
+        cout << "Please play the game first";
+        _getch();
+    }else{
+        int i = 0;
+        int count = 0;
+        while (!infile.eof()) {
+            infile >> p[i].name >> p[i].score;
+            i++;
+            count++;
         }
+        infile.close();
+
+        sort(p, p + count, player::comp);
+
+        system("cls");
+        decoration();
+        spaces();
+        cout << "          LEADERBOARD" << endl << endl;
+        spaces();
+        cout << "NO.\tNAME\t\tSCORE" << endl;
+        decoration();
+        for (int i = 0; i < count; i++) {
+            spaces();
+            cout << i + 1 << ".\t" << p[i].name << "\t\t" << p[i].score << endl;
+            if (i == 9) {
+                break;
+            }
+        }
+        decoration();
+        spaces();
+        cout << "Press any key to continue...";
+        _getch();
     }
-    decoration();
-    spaces();
-    cout << "Press any key to continue...";
-    _getch();
 }
