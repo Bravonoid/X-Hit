@@ -1,19 +1,21 @@
-#include <iostream> 
-#include <conio.h>
-#include <windows.h>
-#include <vector>
-#include <fstream>
-#include <string>
-#include <iomanip>
-#include <algorithm>
-#include <cwchar>
+#include <iostream>     // Input Output
+#include <conio.h>      // Keyboard Interrupt
+#include <windows.h>    // Delay
+#include <vector>       // Dynamic Array
+#include <fstream>      // File Operation
+#include <string>       // String Manipulation
+#include <algorithm>    // Sorting
+#include <cwchar>       // Adjust size
 
 using namespace std;
 
+// Core of the game
 void swap(char& a, char& b);
+// UI Purposes
 void fullscreen();
 void decoration();
 void spaces(string str);
+// Main Program
 void intro();
 void menu();
 void game(bool player);
@@ -21,7 +23,6 @@ void map(vector <vector<char>>& area, int& j, int& k, int& playerI, int& playerJ
 void pixel();
 void leaderboard();
 void input_leaderboard(string& name, int& score);
-void player();
 void credits();
 void instruction();
 
@@ -32,6 +33,7 @@ int main(int argc, char const* argv[])
     return 0;
 }
 
+// For swapping index
 void swap(char& a, char& b) {
     char temp;
     temp = a;
@@ -39,6 +41,7 @@ void swap(char& a, char& b) {
     b = temp;
 }
 
+// To make the terminal become fullscreen
 void fullscreen() {
     system("mode con COLS=700");
     ShowWindow(GetConsoleWindow(), SW_MAXIMIZE);
@@ -54,6 +57,7 @@ void fullscreen() {
     SetCurrentConsoleFontEx(GetStdHandle(STD_OUTPUT_HANDLE), FALSE, &cfi);
 }
 
+// To center output (adding spaces before the output)
 void spaces(int len = 48) {
     string str = "" ;
     int length = len - (str.length() / 4);
@@ -62,6 +66,7 @@ void spaces(int len = 48) {
     }
 }
 
+// Instruction before getting into the game
 void instruction(){
     system("cls");
     char ch;
@@ -90,6 +95,7 @@ void instruction(){
     ch = _getch();
 }
 
+// Intro with moving text
 void intro() {
     int j = 0;
     int k = 0;
@@ -131,6 +137,7 @@ void intro() {
     }
 }
 
+// Main Menu
 void menu() {
     string menu = "MAIN MENU";
     int distance = 30 - (menu.length() * 2);
@@ -179,6 +186,7 @@ void menu() {
             // 4. Credits();
             continue;
         case '5':
+            // 5. Exit
             system("cls");
             spaces(40);
             pixel();
@@ -194,6 +202,7 @@ void menu() {
                 cout << "=";
             }
 
+            // Changing output color
             while(true) {
                 if (color == 9) color = 1;
                 string c = "color " + to_string(color);
@@ -212,6 +221,7 @@ void menu() {
     }
 }
 
+// Credits showing one by one
 void credits () {
     string arr[5][100] = {
         {"Created By"},
@@ -239,6 +249,7 @@ void credits () {
     _getch();
 }
 
+// Output for the map
 void map(vector <vector<char>>& area, int& j, int& k, int& playerI, int& playerJ, int& score) {
     system("cls");
     for (int i = 0; i < 12; i++) {
@@ -259,6 +270,7 @@ void map(vector <vector<char>>& area, int& j, int& k, int& playerI, int& playerJ
     cout << "===============================" << endl;
 }
 
+// Game
 void game(bool player) {
     string name;
     if(player){
@@ -274,12 +286,13 @@ void game(bool player) {
     int score = 0;
     bool lose = false;
 
+    // random generator
     vector <int> random;
     for (int i = 0; i < 10000; i++) {
         random.push_back(rand() % 12 + 1);
     }
 
-    // 5. Random Obstacles
+    // making the maps (including player and random obstacles)
     vector <vector<char>> area;
     for (int i = 0; i < 12; i++) {
         area.push_back(vector<char>());
@@ -339,9 +352,10 @@ void game(bool player) {
     while (true) {
         map(area, j, k, playerI, playerJ, score);
         char key;
-        // 7. Difficulty Mechanism
+        // Difficulty Mechanism
         Sleep(500 - score);
 
+        // Keyboard interrupt
         if (_kbhit()) {
             key = _getch();
             if ((key == 'w' || key == 'W') && (playerI > 0)) {
@@ -358,8 +372,10 @@ void game(bool player) {
             swap(area[playerI][playerJ], area[playerI+1][playerJ+1]);
         }
 
+        // Check lose
         if (lose == true) {
             char again;
+            // Save score (only on player)
             if(player){
                 ofstream outfile;
                 outfile.open("leaderboard.txt", std::ofstream::ate| std::ofstream::app);
@@ -378,10 +394,11 @@ void game(bool player) {
                 cout << "FINAL POINTS : " << score << endl;
                 spaces();
                 cout << "=================" << endl;
+
+                // Play again?
                 spaces();
                 cout << "Play Again? [Y/N]: ";
                 again = _getch();
-
                 if (again == 'y' || again == 'Y') {
                     goto repeat;
                 }
@@ -395,11 +412,13 @@ void game(bool player) {
             break;
         }
         score++;
+        // Core of moving map
         k++;
         j = k;
     }
 }
 
+// Decoration purpose (adding '=' multiple times)
 void decoration() {
     spaces();
     for (int i = 0; i < 31; i++) {
@@ -408,6 +427,7 @@ void decoration() {
     cout << endl;
 }
 
+// Addition for the outro
 void pixel() {
     cout << endl;
     spaces(38);
@@ -435,6 +455,7 @@ void pixel() {
     cout << endl;
 }
 
+// Leaderboard mechanism
 void leaderboard() {
     struct player {
         string name;
@@ -450,6 +471,7 @@ void leaderboard() {
     ifstream infile;
     infile.open("leaderboard.txt");
 
+    // Check leaderboard.txt exist or not
     if (infile.fail()) {
         system("cls");
         decoration();
@@ -462,6 +484,8 @@ void leaderboard() {
     }else{
         int i = 0;
         int count = 0;
+
+        // Insert name and score to leaderboard.txt
         while (!infile.eof()) {
             infile >> p[i].name >> p[i].score;
             i++;
@@ -469,8 +493,10 @@ void leaderboard() {
         }
         infile.close();
 
+        // Sorting descending
         sort(p, p + count, player::comp);
 
+        // Showing the leaderboard
         system("cls");
         decoration();
         spaces();
